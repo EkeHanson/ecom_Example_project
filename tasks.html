@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team Task Board - Novena, Dozie & Godspower</title>
+    <style>
+        /* ----- RESET & BASE ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ----- HEADER ----- */
+        .header {
+            text-align: center;
+            padding: 2rem 0 1.5rem;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: #1a2a3a;
+            letter-spacing: -0.5px;
+        }
+
+        .header h1 span {
+            color: #3498db;
+        }
+
+        .header p {
+            color: #5a6a7a;
+            font-size: 1.05rem;
+            margin-top: 0.3rem;
+        }
+
+        .team-badge {
+            display: inline-flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .team-badge .member {
+            background: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .team-badge .member .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-novena { background: #8e44ad; }
+        .dot-dozie  { background: #2980b9; }
+        .dot-godspower { background: #27ae60; }
+
+        /* ----- STATS ROW ----- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            text-align: center;
+        }
+
+        .stat-card .num {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a2a3a;
+        }
+
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: #7a8a9a;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 0.1rem;
+        }
+
+        /* ----- TASK BOARD (3 columns) ----- */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .column {
+            background: white;
+            border-radius: 16px;
+            padding: 1.2rem 1.2rem 1.5rem;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 1rem;
+        }
+
+        .column-header .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .avatar-novena { background: #8e44ad; }
+        .avatar-dozie  { background: #2980b9; }
+        .avatar-godspower { background: #27ae60; }
+
+        .column-header .col-name {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1a2a3a;
+        }
+
+        .column-header .task-count {
+            margin-left: auto;
+            background: #eef2f6;
+            padding: 0.1rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #3a4a5a;
+        }
+
+        /* ----- TASK ITEM ----- */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .task-card {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            border-left: 4px solid #b0c0d0;
+            transition: 0.2s;
+        }
+
+        .task-card:hover {
+            background: #f0f4fa;
+            transform: translateX(2px);
+        }
+
+        .task-card .task-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1a2a3a;
+        }
+
+        .task-card .task-desc {
+            font-size: 0.85rem;
+            color: #5a6a7a;
+            margin-top: 0.15rem;
+        }
+
+        .task-card .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .task-card .task-meta .tag {
+            padding: 0.1rem 0.7rem;
+            border-radius: 20px;
+            font-weight: 600;
+            background: #eef2f6;
+            color: #3a4a5a;
+        }
+
+        .tag-easy   { background: #d5f5e3; color: #1a7a3a; }
+        .tag-medium { background: #fdebd0; color: #b9770e; }
+        .tag-hard   { background: #fadbd8; color: #b03a2e; }
+
+        .task-card .task-meta .status {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-todo        { background: #95a5a6; }
+        .status-inprogress  { background: #f39c12; }
+        .status-done        { background: #27ae60; }
+
+        /* ----- RESPONSIVE ----- */
+        @media (max-width: 900px) {
+            .board {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .board {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .team-badge {
+                gap: 0.8rem;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* ----- FOOTER ----- */
+        .footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            color: #8a9aaa;
+            font-size: 0.85rem;
+            border-top: 1px solid #e0e8f0;
+            padding-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="header">
+        <h1>📋 Team <span>Task Board</span></h1>
+        <p>Novena &bull; Dozie &bull; Godspower</p>
+        <div class="team-badge">
+            <span class="member"><span class="dot dot-novena"></span> Novena</span>
+            <span class="member"><span class="dot dot-dozie"></span> Dozie</span>
+            <span class="member"><span class="dot dot-godspower"></span> Godspower</span>
+        </div>
+    </div>
+
+    <!-- ===== STATS ===== -->
+    <div class="stats-row" id="statsRow">
+        <!-- filled by JS -->
+    </div>
+
+    <!-- ===== BOARD (3 columns) ===== -->
+    <div class="board" id="board">
+        <!-- filled by JS -->
+    </div>
+
+    <div class="footer">
+        🚀 Each task shows who it's assigned to — work together and have fun!
+    </div>
+
+</div>
+
+<script>
+    // ============================================================
+    //  TASK DATA — each task has a title, description, difficulty,
+    //  status, and the person it's assigned to.
+    // ============================================================
+
+    const tasks = [
+        // ----- NOVENA -----
+        {
+            title: '🔍 Fix search bar on homepage',
+            desc: 'Make the search bar actually filter products.',
+            difficulty: 'easy',
+            status: 'todo',
+            assignedTo: 'Novena'
+        },
+        {
+            title: '🎨 Style the login button',
+            desc: 'Make it blue with rounded corners and a hover effect.',
+            difficulty: 'easy',
+            status: 'in-progress',
+            assignedTo: 'Novena'
+        },
+        {
+            title: '📱 Make header responsive',
+            desc: 'Stack the nav links vertically on small screens.',
+            difficulty: 'medium',
+            status: 'todo',
+            assignedTo: 'Novena'
+        },
+        {
+            title: '🧹 Clean up CSS variables',
+            desc: 'Move all colors into :root variables for consistency.',
+            difficulty: 'easy',
+            status: 'done',
+            assignedTo: 'Novena'
+        },
+        {
+            title: '🛒 Add "Add to Cart" feedback',
+            desc: 'Show a small toast notification when a product is added.',
+            difficulty: 'medium',
+            status: 'todo',
+            assignedTo: 'Novena'
+        },
+        {
+            title: '📊 Create a simple dashboard',
+            desc: 'Show total products, orders, and users count.',
+            difficulty: 'hard',
+            status: 'todo',
+            assignedTo: 'Novena'
+        },
+
+        // ----- DOZIE -----
+        {
+            title: '📦 Fix product card layout',
+            desc: 'Make all product cards the same height.',
+            difficulty: 'easy',
+            status: 'todo',
+            assignedTo: 'Dozie'
+        },
+        {
+            title: '🔢 Add quantity selector',
+            desc: 'Let users choose how many items to add to cart.',
+            difficulty: 'medium',
+            status: 'in-progress',
+            assignedTo: 'Dozie'
+        },
+        {
+            title: '💾 Save cart in localStorage',
+            desc: 'So items stay in cart even after refresh.',
+            difficulty: 'medium',
+            status: 'todo',
+            assignedTo: 'Dozie'
+        },
+        {
+            title: '🗑️ Add delete button on cart items',
+            desc: 'Each cart item should have a trash icon to remove it.',
+            difficulty: 'easy',
+            status: 'done',
+            assignedTo: 'Dozie'
+        },
+        {
+            title: '🧮 Calculate cart total',
+            desc: 'Show subtotal and total price in the cart page.',
+            difficulty: 'easy',
+            status: 'done',
+            assignedTo: 'Dozie'
+        },
+        {
+            title: '📬 Create a contact form',
+            desc: 'Add a simple contact form in the footer.',
+            difficulty: 'medium',
+            status: 'todo',
+            assignedTo: 'Dozie'
+        },
+
+        // ----- GODSPOWER -----
+        {
+            title: '🌟 Add star ratings on products',
+            desc: 'Show rating stars (★) on each product card.',
+            difficulty: 'easy',
+            status: 'todo',
+            assignedTo: 'Godspower'
+        },
+        {
+            title: '🔎 Filter products by category',
+            desc: 'Let users click a category to filter the product list.',
+            difficulty: 'medium',
+            status: 'in-progress',
+            assignedTo: 'Godspower'
+        },
+        {
+            title: '📄 Create a product detail page',
+            desc: 'Show full info when a product is clicked.',
+            difficulty: 'hard',
+            status: 'todo',
+            assignedTo: 'Godspower'
+        },
+        {
+            title: '🎯 Highlight active nav link',
+            desc: 'Add a bottom border or color to the current page link.',
+            difficulty: 'easy',
+            status: 'done',
+            assignedTo: 'Godspower'
+        },
+        {
+            title: '🔄 Add loading spinner',
+            desc: 'Show a spinner while pages are loading.',
+            difficulty: 'medium',
+            status: 'todo',
+            assignedTo: 'Godspower'
+        },
+        {
+            title: '📈 Sort products by price',
+            desc: 'Add dropdown to sort low-to-high or high-to-low.',
+            difficulty: 'medium',
+            status: 'todo',
+            assignedTo: 'Godspower'
+        }
+    ];
+
+    // ============================================================
+    //  RENDER FUNCTIONS
+    // ============================================================
+
+    // Get all unique team members
+    const members = ['Novena', 'Dozie', 'Godspower'];
+
+    // Helper: get tasks for a person
+    function getTasksFor(person) {
+        return tasks.filter(t => t.assignedTo === person);
+    }
+
+    // Helper: get status label
+    function statusLabel(status) {
+        const map = {
+            'todo': 'To Do',
+            'in-progress': 'In Progress',
+            'done': 'Done'
+        };
+        return map[status] || status;
+    }
+
+    // Helper: difficulty label
+    function diffLabel(diff) {
+        return diff.charAt(0).toUpperCase() + diff.slice(1);
+    }
+
+    // Render stats
+    function renderStats() {
+        const container = document.getElementById('statsRow');
+        const total = tasks.length;
+        const todo = tasks.filter(t => t.status === 'todo').length;
+        const done = tasks.filter(t => t.status === 'done').length;
+        const inProgress = tasks.filter(t => t.status === 'in-progress').length;
+
+        container.innerHTML = `
+            <div class="stat-card"><div class="num">${total}</div><div class="label">Total Tasks</div></div>
+            <div class="stat-card"><div class="num">${todo}</div><div class="label">To Do</div></div>
+            <div class="stat-card"><div class="num">${inProgress}</div><div class="label">In Progress</div></div>
+            <div class="stat-card"><div class="num">${done}</div><div class="label">Done</div></div>
+        `;
+    }
+
+    // Render the board
+    function renderBoard() {
+        const board = document.getElementById('board');
+
+        board.innerHTML = members.map(person => {
+            const personTasks = getTasksFor(person);
+            const doneCount = personTasks.filter(t => t.status === 'done').length;
+
+            // Avatar class
+            const avatarClass = person === 'Novena' ? 'avatar-novena' :
+                               person === 'Dozie' ? 'avatar-dozie' :
+                               'avatar-godspower';
+
+            const dotClass = person === 'Novena' ? 'dot-novena' :
+                            person === 'Dozie' ? 'dot-dozie' :
+                            'dot-godspower';
+
+            return `
+                <div class="column">
+                    <div class="column-header">
+                        <div class="avatar ${avatarClass}">${person.charAt(0)}</div>
+                        <span class="col-name">${person}</span>
+                        <span class="task-count">${personTasks.length} · ${doneCount} done</span>
+                    </div>
+                    <div class="task-list">
+                        ${personTasks.map(task => {
+                            // difficulty tag class
+                            const diffClass = task.difficulty === 'easy' ? 'tag-easy' :
+                                              task.difficulty === 'medium' ? 'tag-medium' : 'tag-hard';
+
+                            // status dot class
+                            const statusDotClass = task.status === 'todo' ? 'status-todo' :
+                                                   task.status === 'in-progress' ? 'status-inprogress' : 'status-done';
+
+                            return `
+                                <div class="task-card">
+                                    <div class="task-title">${task.title}</div>
+                                    <div class="task-desc">${task.desc}</div>
+                                    <div class="task-meta">
+                                        <span class="tag ${diffClass}">${diffLabel(task.difficulty)}</span>
+                                        <span class="status">
+                                            <span class="status-dot ${statusDotClass}"></span>
+                                            ${statusLabel(task.status)}
+                                        </span>
+                                        <span style="color:#8a9aaa; font-size:0.7rem;">
+                                            👤 ${task.assignedTo}
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                        ${personTasks.length === 0 ? `
+                            <div style="color:#aaa; text-align:center; padding:1rem 0; font-size:0.9rem;">
+                                ✨ No tasks yet
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+
+    renderStats();
+    renderBoard();
+</script>
+
+</body>
+</html>
